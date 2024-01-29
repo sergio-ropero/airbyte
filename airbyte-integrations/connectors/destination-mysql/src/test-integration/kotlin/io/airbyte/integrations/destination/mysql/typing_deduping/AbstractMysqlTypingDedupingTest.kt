@@ -31,9 +31,12 @@ abstract class AbstractMysqlTypingDedupingTest : JdbcTypingDedupingTest() {
     override fun getDataSource(config: JsonNode?): DataSource =
         MySQLDestination().getDataSource(bareMetalConfig)
 
-    override fun disableFinalTableComparison(): Boolean {
-        // TODO delete this in the next stacked PR
-        return true
+    override fun getDefaultSchema(config: JsonNode): String {
+        return config["database"].asText()
+    }
+
+    override fun setDefaultSchema(config: JsonNode, schema: String?) {
+        (config as ObjectNode).put("database", schema)
     }
 
     @Throws(Exception::class)
@@ -102,7 +105,6 @@ abstract class AbstractMysqlTypingDedupingTest : JdbcTypingDedupingTest() {
         @Throws(Exception::class)
         fun setupMysql() {
             testContainer = MysqlTestDatabase.`in`(MysqlTestDatabase.BaseImage.MYSQL_8)
-
             containerizedConfig =
                 testContainer
                     .configBuilder()
