@@ -66,7 +66,7 @@ abstract class JdbcSqlGeneratorIntegrationTest<DestinationState : MinimumDestina
                 DSL.table(tableName),
                 columnNames
                     .stream()
-                    .map { columnName: String? -> DSL.field(DSL.quotedName(columnName)) }
+                    .map { columnName: String -> DSL.field(DSL.quotedName(columnName)) }
                     .toList()
             )
         for (record in records) {

@@ -131,7 +131,7 @@ class DefaultTyperDeduperTest {
         Mockito.`when`(destinationHandler.gatherInitialState(ArgumentMatchers.anyList()))
             .thenReturn(initialStates)
         initialStates.forEach(
-            Consumer { initialState: DestinationInitialStatus<MockState>? ->
+            Consumer { initialState: DestinationInitialStatus<MockState> ->
                 Mockito.`when`(initialState!!.initialRawTableStatus)
                     .thenReturn(InitialRawTableStatus(true, true, Optional.empty()))
             }
@@ -169,7 +169,7 @@ class DefaultTyperDeduperTest {
     @Throws(Exception::class)
     fun emptyDestination() {
         initialStates!!.forEach(
-            Consumer { initialState: DestinationInitialStatus<MockState>? ->
+            Consumer { initialState: DestinationInitialStatus<MockState> ->
                 Mockito.`when`(initialState!!.isFinalTablePresent).thenReturn(false)
             }
         )
@@ -219,7 +219,7 @@ class DefaultTyperDeduperTest {
     @Throws(Exception::class)
     fun existingEmptyTable() {
         initialStates!!.forEach(
-            Consumer { initialState: DestinationInitialStatus<MockState>? ->
+            Consumer { initialState: DestinationInitialStatus<MockState> ->
                 Mockito.`when`(initialState!!.isFinalTablePresent).thenReturn(true)
                 Mockito.`when`(initialState.isFinalTableEmpty).thenReturn(true)
                 Mockito.`when`(initialState.isSchemaMismatch).thenReturn(true)
@@ -296,7 +296,7 @@ class DefaultTyperDeduperTest {
     @Throws(Exception::class)
     fun existingEmptyTableMatchingSchema() {
         initialStates!!.forEach(
-            Consumer { initialState: DestinationInitialStatus<MockState>? ->
+            Consumer { initialState: DestinationInitialStatus<MockState> ->
                 Mockito.`when`(initialState!!.isFinalTablePresent).thenReturn(true)
                 Mockito.`when`(initialState.isFinalTableEmpty).thenReturn(true)
                 Mockito.`when`(initialState.isSchemaMismatch).thenReturn(false)
@@ -327,7 +327,7 @@ class DefaultTyperDeduperTest {
     @Throws(Exception::class)
     fun existingNonemptyTable() {
         initialStates!!.forEach(
-            Consumer { initialState: DestinationInitialStatus<MockState>? ->
+            Consumer { initialState: DestinationInitialStatus<MockState> ->
                 Mockito.`when`(initialState!!.isFinalTablePresent).thenReturn(true)
                 Mockito.`when`(initialState.isFinalTableEmpty).thenReturn(false)
                 Mockito.`when`(initialState.isSchemaMismatch).thenReturn(true)
@@ -426,7 +426,7 @@ class DefaultTyperDeduperTest {
     @Throws(Exception::class)
     fun existingNonemptyTableMatchingSchema() {
         initialStates!!.forEach(
-            Consumer { initialState: DestinationInitialStatus<MockState>? ->
+            Consumer { initialState: DestinationInitialStatus<MockState> ->
                 Mockito.`when`(initialState!!.isFinalTablePresent).thenReturn(true)
                 Mockito.`when`(initialState.isFinalTableEmpty).thenReturn(false)
                 Mockito.`when`(initialState.isSchemaMismatch).thenReturn(false)
@@ -487,7 +487,7 @@ class DefaultTyperDeduperTest {
     @Throws(Exception::class)
     fun noUnprocessedRecords() {
         initialStates.forEach(
-            Consumer { initialState: DestinationInitialStatus<MockState>? ->
+            Consumer { initialState: DestinationInitialStatus<MockState> ->
                 Mockito.`when`(initialState!!.initialRawTableStatus)
                     .thenReturn(InitialRawTableStatus(true, false, Optional.empty()))
             }
@@ -526,7 +526,7 @@ class DefaultTyperDeduperTest {
     @Throws(Exception::class)
     fun unprocessedRecords() {
         initialStates!!.forEach(
-            Consumer { initialState: DestinationInitialStatus<MockState>? ->
+            Consumer { initialState: DestinationInitialStatus<MockState> ->
                 Mockito.`when`(initialState!!.initialRawTableStatus)
                     .thenReturn(
                         InitialRawTableStatus(

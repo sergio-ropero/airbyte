@@ -168,7 +168,7 @@ abstract class JdbcDatabase(protected val sourceOperations: JdbcCompatibleSource
      */
     @MustBeClosed
     @Throws(SQLException::class)
-    override fun unsafeQuery(sql: String?, vararg params: String?): Stream<JsonNode> {
+    override fun unsafeQuery(sql: String?, vararg params: String): Stream<JsonNode> {
         return unsafeQuery(
             { connection: Connection ->
                 val statement = connection.prepareStatement(sql)
@@ -188,7 +188,7 @@ abstract class JdbcDatabase(protected val sourceOperations: JdbcCompatibleSource
      * syntactic sugar.
      */
     @Throws(SQLException::class)
-    fun queryJsons(sql: String?, vararg params: String?): List<JsonNode> {
+    fun queryJsons(sql: String?, vararg params: String): List<JsonNode> {
         unsafeQuery(sql, *params).use { stream ->
             return stream.toList()
         }
@@ -208,7 +208,7 @@ abstract class JdbcDatabase(protected val sourceOperations: JdbcCompatibleSource
     @get:Throws(SQLException::class) abstract val metaData: DatabaseMetaData
 
     @Throws(SQLException::class)
-    abstract fun <T> executeMetadataQuery(query: Function<DatabaseMetaData?, T>): T
+    abstract fun <T> executeMetadataQuery(query: Function<DatabaseMetaData, T>): T
 
     companion object {
         /**

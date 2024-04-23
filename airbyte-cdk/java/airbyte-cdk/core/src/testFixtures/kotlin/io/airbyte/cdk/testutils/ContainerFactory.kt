@@ -120,7 +120,7 @@ abstract class ContainerFactory<C : GenericContainer<*>> {
         // Container creation can be exceedingly slow.
         // Furthermore, we need to handle exceptions raised during container creation.
         val containerOrError =
-            SHARED_CONTAINERS!!.computeIfAbsent(containerKey) { key: ContainerKey<*>? ->
+            SHARED_CONTAINERS!!.computeIfAbsent(containerKey) { key: ContainerKey<*> ->
                 ContainerOrException {
                     createAndStartContainer(key!!.imageName, namedContainerModifiers)
                 }
@@ -218,7 +218,7 @@ abstract class ContainerFactory<C : GenericContainer<*>> {
             }
         getTestContainerLogMdcBuilder(imageName, namedContainerModifiers)!!.produceMappings {
             key: String?,
-            value: String? ->
+            value: String ->
             logConsumer.withMdc(key, value)
         }
         container!!.withLogConsumer(logConsumer)
@@ -238,7 +238,7 @@ abstract class ContainerFactory<C : GenericContainer<*>> {
     companion object {
         private val LOGGER: Logger? = LoggerFactory.getLogger(ContainerFactory::class.java)
 
-        private val SHARED_CONTAINERS: ConcurrentMap<ContainerKey<*>?, ContainerOrException?>? =
+        private val SHARED_CONTAINERS: ConcurrentMap<ContainerKey<*>, ContainerOrException> =
             ConcurrentHashMap()
         private val containerId: AtomicInteger? = AtomicInteger(0)
     }

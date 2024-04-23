@@ -27,9 +27,9 @@ class JdbcV1V2Migrator(
     @SneakyThrows
     override fun doesAirbyteInternalNamespaceExist(streamConfig: StreamConfig?): Boolean {
         val retrievedSchema =
-            database.executeMetadataQuery<String> { dbMetadata: DatabaseMetaData? ->
+            database.executeMetadataQuery<String> { dbMetadata: DatabaseMetaData ->
                 try {
-                    dbMetadata!!.getSchemas(databaseName, streamConfig!!.id.rawNamespace).use {
+                    dbMetadata.getSchemas(databaseName, streamConfig!!.id.rawNamespace).use {
                         columns ->
                         var schema = ""
                         while (columns.next()) {

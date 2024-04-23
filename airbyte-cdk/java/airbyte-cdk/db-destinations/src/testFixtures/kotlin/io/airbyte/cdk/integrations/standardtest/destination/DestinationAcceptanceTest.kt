@@ -1717,7 +1717,7 @@ abstract class DestinationAcceptanceTest {
             val msgList =
                 retrieveRecords(testEnv, streamName, schema, stream.jsonSchema)
                     .stream()
-                    .map { data: JsonNode? ->
+                    .map { data: JsonNode ->
                         AirbyteRecordMessage()
                             .withStream(streamName)
                             .withNamespace(schema)
@@ -1775,7 +1775,7 @@ abstract class DestinationAcceptanceTest {
             val msgList =
                 retrieveNormalizedRecords(testEnv, streamName, defaultSchema)
                     .stream()
-                    .map { data: JsonNode? ->
+                    .map { data: JsonNode ->
                         AirbyteRecordMessage().withStream(streamName).withData(data)
                     }
                     .toList()

@@ -416,7 +416,7 @@ class DefaultTyperDeduper<DestinationState : MinimumDestinationState>(
                 }
                 shouldRunTypingDeduping
             }
-            .forEach { streamConfig: StreamConfig? ->
+            .forEach { streamConfig: StreamConfig ->
                 typeAndDedupeTasks.add(typeAndDedupeTask(streamConfig, true))
             }
         CompletableFuture.allOf(*typeAndDedupeTasks.toTypedArray()).join()

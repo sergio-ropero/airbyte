@@ -72,7 +72,7 @@ abstract class JdbcDestinationHandler<DestinationState>(
     @Throws(Exception::class)
     private fun getInitialRawTableState(id: StreamId): InitialRawTableStatus {
         val tableExists =
-            jdbcDatabase.executeMetadataQuery { dbmetadata: DatabaseMetaData? ->
+            jdbcDatabase.executeMetadataQuery { dbmetadata: DatabaseMetaData ->
                 LOGGER.info(
                     "Retrieving table from Db metadata: {} {} {}",
                     databaseName,
@@ -80,7 +80,7 @@ abstract class JdbcDestinationHandler<DestinationState>(
                     id.rawName
                 )
                 try {
-                    dbmetadata!!.getTables(databaseName, id.rawNamespace, id.rawName, null).use {
+                    dbmetadata.getTables(databaseName, id.rawNamespace, id.rawName, null).use {
                         table ->
                         return@executeMetadataQuery table.next()
                     }
@@ -113,7 +113,7 @@ abstract class JdbcDestinationHandler<DestinationState>(
                 // records).
                 val minUnloadedTimestamp: Optional<Timestamp> =
                     timestampStream
-                        .filter(Predicate<Timestamp> { obj: Timestamp? -> Objects.nonNull(obj) })
+                        .filter(Predicate<Timestamp> { obj: Timestamp -> Objects.nonNull(obj) })
                         .findFirst()
                 if (minUnloadedTimestamp.isPresent) {
                     // Decrement by 1 second since timestamp precision varies between databases.
@@ -141,7 +141,7 @@ abstract class JdbcDestinationHandler<DestinationState>(
                 // all).
                 val minUnloadedTimestamp: Optional<Timestamp> =
                     timestampStream
-                        .filter(Predicate<Timestamp> { obj: Timestamp? -> Objects.nonNull(obj) })
+                        .filter(Predicate<Timestamp> { obj: Timestamp -> Objects.nonNull(obj) })
                         .findFirst()
                 return InitialRawTableStatus(
                     true,
@@ -394,8 +394,8 @@ abstract class JdbcDestinationHandler<DestinationState>(
                         column: Map.Entry<String?, ColumnDefinition> ->
                         map[column.key] = column.value.type
                     },
-                    { obj: LinkedHashMap<String?, String>, m: LinkedHashMap<String?, String>? ->
-                        obj.putAll(m!!)
+                    { obj: LinkedHashMap<String?, String>, m: LinkedHashMap<String?, String> ->
+                        obj.putAll(m)
                     }
                 )
 
@@ -424,7 +424,7 @@ abstract class JdbcDestinationHandler<DestinationState>(
                                             .eq(streamId.originalNamespace)
                                     )
                             }
-                            .reduce(DSL.falseCondition()) { obj: Condition, arg2: Condition? ->
+                            .reduce(DSL.falseCondition()) { obj: Condition, arg2: Condition ->
                                 obj.or(arg2)
                             }
                     )
@@ -495,7 +495,7 @@ abstract class JdbcDestinationHandler<DestinationState>(
             tableName: String?
         ): Optional<TableDefinition> {
             val retrievedColumnDefns =
-                jdbcDatabase.executeMetadataQuery { dbMetadata: DatabaseMetaData? ->
+                jdbcDatabase.executeMetadataQuery { dbMetadata: DatabaseMetaData ->
 
                     // TODO: normalize namespace and finalName strings to quoted-lowercase (as
                     // needed. Snowflake
@@ -508,7 +508,7 @@ abstract class JdbcDestinationHandler<DestinationState>(
                         tableName
                     )
                     try {
-                        dbMetadata!!.getColumns(databaseName, schemaName, tableName, null).use {
+                        dbMetadata.getColumns(databaseName, schemaName, tableName, null).use {
                             columns ->
                             while (columns.next()) {
                                 val columnName = columns.getString("COLUMN_NAME")

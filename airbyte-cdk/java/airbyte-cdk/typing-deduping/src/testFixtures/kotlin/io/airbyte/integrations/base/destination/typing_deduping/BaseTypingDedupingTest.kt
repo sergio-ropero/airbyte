@@ -1092,7 +1092,7 @@ abstract class BaseTypingDedupingTest {
                 .map { obj: String -> obj.trim { it <= ' ' } }
                 .filter { line: String -> !line.isEmpty() }
                 .filter { line: String -> !line.startsWith("//") }
-                .map { jsonString: String? -> Jsons.deserializeExact(jsonString) }
+                .map { jsonString: String -> Jsons.deserializeExact(jsonString) }
                 .toList()
         }
 
@@ -1104,7 +1104,7 @@ abstract class BaseTypingDedupingTest {
         ): List<AirbyteMessage> {
             return readRecords(filename)
                 .stream()
-                .map { record: JsonNode? -> Jsons.convertValue(record, AirbyteMessage::class.java) }
+                .map { record: JsonNode -> Jsons.convertValue(record, AirbyteMessage::class.java) }
                 .peek { message: AirbyteMessage ->
                     message.record.namespace = streamNamespace
                     message.record.stream = streamName

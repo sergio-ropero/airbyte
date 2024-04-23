@@ -48,7 +48,7 @@ internal class SshTunnelTest {
                     if (endPointURL == null) "fakeHost.com" else null,
                     if (endPointURL == null) 5432 else 0
                 ) {
-                public override fun openTunnel(client: SshClient): ClientSession? {
+                override fun openTunnel(client: SshClient): ClientSession? {
                     tunnelLocalPort = 8080
                     return null // Prevent tunnel from attempting to connect
                 }
@@ -56,13 +56,13 @@ internal class SshTunnelTest {
 
         val configInTunnel = sshTunnel.configInTunnel
         if (endPointURL == null) {
-            Assertions.assertTrue(configInTunnel!!.has("port"))
+            Assertions.assertTrue(configInTunnel.has("port"))
             Assertions.assertTrue(configInTunnel.has("host"))
             Assertions.assertFalse(configInTunnel.has("endpoint"))
-            Assertions.assertEquals(8080, configInTunnel!!["port"].asInt())
+            Assertions.assertEquals(8080, configInTunnel["port"].asInt())
             Assertions.assertEquals("127.0.0.1", configInTunnel["host"].asText())
         } else {
-            Assertions.assertFalse(configInTunnel!!.has("port"))
+            Assertions.assertFalse(configInTunnel.has("port"))
             Assertions.assertFalse(configInTunnel.has("host"))
             Assertions.assertTrue(configInTunnel.has("endpoint"))
             Assertions.assertEquals(
@@ -101,7 +101,7 @@ internal class SshTunnelTest {
                     "fakeHost.com",
                     5432
                 ) {
-                public override fun openTunnel(client: SshClient): ClientSession? {
+                override fun openTunnel(client: SshClient): ClientSession? {
                     return null // Prevent tunnel from attempting to connect
                 }
             }

@@ -78,8 +78,8 @@ constructor(
             actualStreamConfig.columns!!
                 .keys
                 .forEach(
-                    Consumer { columnId: ColumnId? ->
-                        addStringForDeinterpolation(columnId!!.name)
+                    Consumer { columnId: ColumnId ->
+                        addStringForDeinterpolation(columnId.name)
                         addStringForDeinterpolation(columnId.originalName)
                     }
                 )
