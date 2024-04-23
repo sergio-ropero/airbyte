@@ -27,7 +27,6 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import java.util.function.Consumer
 import java.util.function.Function
-import java.util.stream.Collectors
 import java.util.stream.Stream
 import org.apache.commons.lang3.RandomStringUtils
 import org.junit.jupiter.api.*
@@ -901,7 +900,7 @@ abstract class BaseTypingDedupingTest {
         return Collections.nCopies(n, list)
             .stream()
             .flatMap { obj: List<T> -> obj.stream() }
-            .collect(Collectors.toList())
+            .toList()
     }
 
     @Throws(Exception::class)

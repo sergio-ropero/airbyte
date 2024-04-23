@@ -62,7 +62,6 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Consumer
-import java.util.stream.Collectors
 import java.util.stream.Stream
 import kotlin.test.assertNotNull
 import org.junit.jupiter.api.*
@@ -482,7 +481,7 @@ abstract class DestinationAcceptanceTest {
                             else message.toString()
                         }
                 )
-                .collect(Collectors.toList())
+                .toList()
 
         val config = getConfig()
         runSyncAndVerifyStateOutput(config, largeNumberRecords, configuredCatalog, false)
@@ -857,7 +856,7 @@ abstract class DestinationAcceptanceTest {
                     }
                     message
                 }
-                .collect(Collectors.toList())
+                .toList()
         assertSameMessages(expectedMessages, actualMessages, true)
     }
 
@@ -1027,7 +1026,7 @@ abstract class DestinationAcceptanceTest {
                             it.record.data["NZD"].asText()
                     (it.record.emittedAt == latestMessagesOnly[key]!!.record.emittedAt)
                 }
-                .collect(Collectors.toList())
+                .toList()
 
         val defaultSchema = getDefaultSchema(config)
         retrieveRawRecordsAndAssertSameMessages(
@@ -1748,7 +1747,7 @@ abstract class DestinationAcceptanceTest {
                     if (pruneAirbyteInternalFields) safePrune(recordMessage) else recordMessage
                 }
                 .map { obj: AirbyteRecordMessage -> obj.data }
-                .collect(Collectors.toList())
+                .toList()
 
         val actualProcessed =
             actual
@@ -1757,7 +1756,7 @@ abstract class DestinationAcceptanceTest {
                     if (pruneAirbyteInternalFields) safePrune(recordMessage) else recordMessage
                 }
                 .map { obj: AirbyteRecordMessage -> obj.data }
-                .collect(Collectors.toList())
+                .toList()
 
         _testDataComparator.assertSameData(expectedProcessed, actualProcessed)
     }

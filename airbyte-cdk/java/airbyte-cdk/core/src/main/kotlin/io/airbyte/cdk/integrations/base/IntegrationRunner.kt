@@ -31,7 +31,6 @@ import java.util.*
 import java.util.concurrent.*
 import java.util.function.Consumer
 import java.util.function.Predicate
-import java.util.stream.Collectors
 import org.apache.commons.lang3.ThreadUtils
 import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import org.slf4j.Logger
@@ -426,10 +425,7 @@ internal constructor(
             val currentThread = Thread.currentThread()
 
             val runningThreads =
-                ThreadUtils.getAllThreads()
-                    .stream()
-                    .filter(ORPHANED_THREAD_FILTER)
-                    .collect(Collectors.toList())
+                ThreadUtils.getAllThreads().stream().filter(ORPHANED_THREAD_FILTER).toList()
             if (runningThreads.isNotEmpty()) {
                 LOGGER.warn(
                     """

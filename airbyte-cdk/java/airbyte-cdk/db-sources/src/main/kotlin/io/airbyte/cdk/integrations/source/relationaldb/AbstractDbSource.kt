@@ -174,7 +174,7 @@ protected constructor(driverClassName: String) :
         val iteratorList =
             Stream.of(incrementalIterators, fullRefreshIterators)
                 .flatMap(Collection<AutoCloseableIterator<AirbyteMessage>>::stream)
-                .collect(Collectors.toList())
+                .toList()
 
         return AutoCloseableIterators.appendOnClose(
             AutoCloseableIterators.concatWithEagerClose(
@@ -307,7 +307,7 @@ protected constructor(driverClassName: String) :
                 .filter { table: TableInfo<CommonField<DataType>> ->
                     !systemNameSpaces.contains(table.nameSpace) && !systemViews.contains(table.name)
                 }
-                .collect(Collectors.toList()))
+                .toList())
     }
 
     protected fun getFullRefreshIterators(
@@ -415,7 +415,7 @@ protected constructor(driverClassName: String) :
                 .stream()
                 .map { obj: CommonField<DataType> -> obj.name }
                 .filter { o: String -> selectedFieldsInCatalog.contains(o) }
-                .collect(Collectors.toList())
+                .toList()
 
         val iterator: AutoCloseableIterator<AirbyteMessage>
         // checks for which sync mode we're using based on the configured airbytestream

@@ -23,7 +23,6 @@ import java.math.BigDecimal
 import java.sql.SQLException
 import java.util.*
 import java.util.function.Consumer
-import java.util.stream.Collectors
 import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.AfterEach
@@ -316,7 +315,7 @@ abstract class JdbcSourceAcceptanceTest<S : Source, T : TestDatabase<*, T, *>> {
                             stream.namespace.startsWith(schemaName)
                         }
                     }
-                    .collect(Collectors.toList())
+                    .toList()
             return filteredCatalog
         } else {
             return catalog
@@ -431,7 +430,7 @@ abstract class JdbcSourceAcceptanceTest<S : Source, T : TestDatabase<*, T, *>> {
                             convertIdBasedOnDatabase(m.record.data[COL_ID].asInt())
                         )
                     }
-                    .collect(Collectors.toList())
+                    .toList()
             return expectedMessages
         }
 
@@ -483,7 +482,7 @@ abstract class JdbcSourceAcceptanceTest<S : Source, T : TestDatabase<*, T, *>> {
                     convertIdBasedOnDatabase(m.record.data[COL_ID].asInt())
                 )
             }
-            .collect(Collectors.toList())
+            .toList()
     }
 
     @Test
@@ -529,7 +528,7 @@ abstract class JdbcSourceAcceptanceTest<S : Source, T : TestDatabase<*, T, *>> {
                     convertIdBasedOnDatabase(m.record.data[COL_ID].asInt())
                 )
             }
-            .collect(Collectors.toList())
+            .toList()
     }
 
     @Test
@@ -873,7 +872,7 @@ abstract class JdbcSourceAcceptanceTest<S : Source, T : TestDatabase<*, T, *>> {
                     convertIdBasedOnDatabase(m.record.data[COL_ID].asInt())
                 )
             }
-            .collect(Collectors.toList())
+            .toList()
     }
 
     // when initial and final cursor fields are the same.
@@ -1193,9 +1192,8 @@ abstract class JdbcSourceAcceptanceTest<S : Source, T : TestDatabase<*, T, *>> {
         // Filter to only keep the main stream name as configured stream
         catalog.withStreams(
             catalog.streams
-                .stream()
                 .filter { s: ConfiguredAirbyteStream -> s.stream.name == streamName() }
-                .collect(Collectors.toList())
+                .toMutableList()
         )
         return catalog
     }
@@ -1203,7 +1201,7 @@ abstract class JdbcSourceAcceptanceTest<S : Source, T : TestDatabase<*, T, *>> {
     protected open fun getCatalog(defaultNamespace: String?): AirbyteCatalog {
         return AirbyteCatalog()
             .withStreams(
-                java.util.List.of(
+                mutableListOf(
                     CatalogHelpers.createAirbyteStream(
                             TABLE_NAME,
                             defaultNamespace,
@@ -1335,7 +1333,7 @@ abstract class JdbcSourceAcceptanceTest<S : Source, T : TestDatabase<*, T, *>> {
                             )
                     )
             }
-            .collect(Collectors.toList())
+            .toList()
     }
 
     protected open fun createState(states: List<DbStreamState>): List<AirbyteStateMessage> {
@@ -1354,7 +1352,7 @@ abstract class JdbcSourceAcceptanceTest<S : Source, T : TestDatabase<*, T, *>> {
                             .withStreamState(Jsons.jsonNode(s))
                     )
             }
-            .collect(Collectors.toList())
+            .toList()
     }
 
     @Throws(SQLException::class)
@@ -1560,7 +1558,7 @@ abstract class JdbcSourceAcceptanceTest<S : Source, T : TestDatabase<*, T, *>> {
         return messages
             .stream()
             .filter { r: AirbyteMessage -> r.type == AirbyteMessage.Type.RECORD }
-            .collect(Collectors.toList())
+            .toList()
     }
 
     protected fun extractStateMessage(messages: List<AirbyteMessage>): List<AirbyteStateMessage> {
@@ -1568,7 +1566,7 @@ abstract class JdbcSourceAcceptanceTest<S : Source, T : TestDatabase<*, T, *>> {
             .stream()
             .filter { r: AirbyteMessage -> r.type == AirbyteMessage.Type.STATE }
             .map { obj: AirbyteMessage -> obj.state }
-            .collect(Collectors.toList())
+            .toList()
     }
 
     protected fun extractStateMessage(
@@ -1582,7 +1580,7 @@ abstract class JdbcSourceAcceptanceTest<S : Source, T : TestDatabase<*, T, *>> {
                     r.state.stream.streamDescriptor.name == streamName
             }
             .map { obj: AirbyteMessage -> obj.state }
-            .collect(Collectors.toList())
+            .toList()
     }
 
     protected fun createRecord(

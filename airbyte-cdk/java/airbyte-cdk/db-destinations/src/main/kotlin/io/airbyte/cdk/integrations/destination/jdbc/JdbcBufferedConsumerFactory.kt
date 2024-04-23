@@ -31,7 +31,6 @@ import java.util.*
 import java.util.concurrent.Executors
 import java.util.function.Consumer
 import java.util.function.Function
-import java.util.stream.Collectors
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -101,7 +100,7 @@ object JdbcBufferedConsumerFactory {
             .streams
             .stream()
             .map(toWriteConfig(namingResolver, config, schemaRequired))
-            .collect(Collectors.toList())
+            .toList()
     }
 
     private fun toWriteConfig(
