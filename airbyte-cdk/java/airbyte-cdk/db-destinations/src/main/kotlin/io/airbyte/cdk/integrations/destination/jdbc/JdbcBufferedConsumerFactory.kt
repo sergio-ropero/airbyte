@@ -96,11 +96,8 @@ object JdbcBufferedConsumerFactory {
                 "jdbc destinations must specify a schema."
             )
         }
-        return catalog!!
-            .streams
-            .stream()
-            .map(toWriteConfig(namingResolver, config, schemaRequired))
-            .toList()
+        // What is this doing???
+        return catalog!!.streams.map(toWriteConfig(namingResolver, config, schemaRequired)::apply)
     }
 
     private fun toWriteConfig(

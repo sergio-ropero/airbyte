@@ -30,7 +30,6 @@ import java.nio.file.Path
 import java.util.*
 import java.util.concurrent.*
 import java.util.function.Consumer
-import java.util.function.Predicate
 import org.apache.commons.lang3.ThreadUtils
 import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import org.slf4j.Logger
@@ -280,7 +279,7 @@ internal constructor(
                      * stream consumer.
                      */
                     val partitionSize = streamConsumer.parallelism
-                    val partitions = Lists.partition(streams.stream().toList(), partitionSize)
+                    val partitions = Lists.partition(streams.toList(), partitionSize)
 
                     // Submit each stream partition for concurrent execution
                     partitions.forEach(
@@ -352,11 +351,10 @@ internal constructor(
          * active so long as the database connection pool is open.
          */
         @VisibleForTesting
-        val ORPHANED_THREAD_FILTER: Predicate<Thread> = Predicate { runningThread: Thread ->
+        fun filterOrphanedThread(runningThread: Thread): Boolean =
             (runningThread.name != Thread.currentThread().name &&
                 !runningThread.isDaemon &&
                 TYPE_AND_DEDUPE_THREAD_NAME != runningThread.name)
-        }
 
         const val INTERRUPT_THREAD_DELAY_MINUTES: Int = 1
         const val EXIT_THREAD_DELAY_MINUTES: Int = 2
@@ -424,8 +422,7 @@ internal constructor(
         ) {
             val currentThread = Thread.currentThread()
 
-            val runningThreads =
-                ThreadUtils.getAllThreads().stream().filter(ORPHANED_THREAD_FILTER).toList()
+            val runningThreads = ThreadUtils.getAllThreads().filter(::filterOrphanedThread).toList()
             if (runningThreads.isNotEmpty()) {
                 LOGGER.warn(
                     """
@@ -461,7 +458,7 @@ internal constructor(
                 scheduledExecutorService.schedule(
                     {
                         if (
-                            ThreadUtils.getAllThreads().stream().anyMatch { runningThread: Thread ->
+                            ThreadUtils.getAllThreads().any { runningThread: Thread ->
                                 !runningThread.isDaemon && runningThread.name != currentThread.name
                             }
                         ) {

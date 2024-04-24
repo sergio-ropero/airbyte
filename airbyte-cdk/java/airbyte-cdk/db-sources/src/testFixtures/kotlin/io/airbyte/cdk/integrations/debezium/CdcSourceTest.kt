@@ -287,7 +287,6 @@ abstract class CdcSourceTest<S : Source, T : TestDatabase<*, T, *>> {
 
     protected fun extractStateMessages(messages: List<AirbyteMessage>): List<AirbyteStateMessage> {
         return messages
-            .stream()
             .filter { r: AirbyteMessage -> r.type == AirbyteMessage.Type.STATE }
             .map { obj: AirbyteMessage -> obj.state }
             .toList()
@@ -683,14 +682,12 @@ abstract class CdcSourceTest<S : Source, T : TestDatabase<*, T, *>> {
         val actualCatalog = source().discover(config()!!)
 
         Assertions.assertEquals(
-            expectedCatalog.streams
-                .stream()
-                .sorted(Comparator.comparing { obj: AirbyteStream -> obj.name })
-                .toList(),
-            actualCatalog.streams
-                .stream()
-                .sorted(Comparator.comparing { obj: AirbyteStream -> obj.name })
-                .toList()
+            expectedCatalog.streams.sortedWith(
+                Comparator.comparing { obj: AirbyteStream -> obj.name }
+            ),
+            actualCatalog.streams.sortedWith(
+                Comparator.comparing { obj: AirbyteStream -> obj.name }
+            )
         )
     }
 
@@ -1054,8 +1051,7 @@ abstract class CdcSourceTest<S : Source, T : TestDatabase<*, T, *>> {
 
         @JvmField
         val MODEL_RECORDS_RANDOM: List<JsonNode> =
-            MODEL_RECORDS.stream()
-                .map { r: JsonNode ->
+            MODEL_RECORDS.map { r: JsonNode ->
                     Jsons.jsonNode(
                         ImmutableMap.of(
                             COL_ID + "_random",

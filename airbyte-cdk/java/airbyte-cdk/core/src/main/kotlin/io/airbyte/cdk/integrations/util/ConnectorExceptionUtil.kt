@@ -10,7 +10,6 @@ import io.airbyte.commons.exceptions.ConnectionErrorException
 import io.airbyte.commons.functional.Either
 import java.sql.SQLException
 import java.sql.SQLSyntaxErrorException
-import java.util.stream.Collectors
 import org.apache.commons.lang3.exception.ExceptionUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -81,10 +80,9 @@ object ConnectorExceptionUtil {
     fun <T : Throwable> logAllAndThrowFirst(initialMessage: String, throwables: Collection<T>) {
         if (!throwables.isEmpty()) {
             val stacktraces =
-                throwables
-                    .stream()
-                    .map { throwable: Throwable -> ExceptionUtils.getStackTrace(throwable) }
-                    .collect(Collectors.joining("\n"))
+                throwables.joinToString("\n") { throwable: Throwable ->
+                    ExceptionUtils.getStackTrace(throwable)
+                }
             LOGGER.error("$initialMessage$stacktraces\nRethrowing first exception.")
             throw throwables.iterator().next()
         }
@@ -100,7 +98,7 @@ object ConnectorExceptionUtil {
             logAllAndThrowFirst(initialMessage, throwables)
         }
         // No need to filter on isRight since isLeft will throw before reaching this line.
-        return eithers.stream().map { obj: Either<out T, Result> -> obj.right!! }.toList()
+        return eithers.map { obj: Either<out T, Result> -> obj.right!! }.toList()
     }
 
     private fun isConfigErrorException(e: Throwable?): Boolean {

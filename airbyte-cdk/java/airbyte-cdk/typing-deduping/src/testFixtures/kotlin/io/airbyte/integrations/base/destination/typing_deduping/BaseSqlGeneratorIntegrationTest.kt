@@ -4,7 +4,6 @@
 package io.airbyte.integrations.base.destination.typing_deduping
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.google.common.collect.Streams
 import io.airbyte.commons.json.Jsons
 import io.airbyte.commons.string.Strings
 import io.airbyte.integrations.base.destination.typing_deduping.TypeAndDedupeTransaction.executeSoftReset
@@ -18,9 +17,6 @@ import io.airbyte.protocol.models.v0.SyncMode
 import java.time.Instant
 import java.util.*
 import java.util.function.Consumer
-import java.util.function.Function
-import java.util.stream.Collectors
-import java.util.stream.Stream
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -776,7 +772,6 @@ abstract class BaseSqlGeneratorIntegrationTest<DestinationState : MinimumDestina
                 Assertions.assertEquals(
                     1,
                     rawRecords
-                        .stream()
                         .filter { record: JsonNode -> record["_airbyte_loaded_at"] == null }
                         .count(),
                     "Raw table should only have non-null loaded_at on the newer record"
@@ -1255,7 +1250,7 @@ abstract class BaseSqlGeneratorIntegrationTest<DestinationState : MinimumDestina
             Executable { Assertions.assertEquals(1, actualFinalRecords.size) },
             Executable {
                 Assertions.assertTrue(
-                    actualFinalRecords.stream().noneMatch { record: JsonNode ->
+                    actualFinalRecords.none { record: JsonNode ->
                         record.has("_ab_cdc_deleted_at")
                     },
                     "_ab_cdc_deleted_at column was expected to be dropped. Actual final table had: $actualFinalRecords"
@@ -1520,15 +1515,7 @@ abstract class BaseSqlGeneratorIntegrationTest<DestinationState : MinimumDestina
     }
 
     protected fun migrationAssertions(v1RawRecords: List<JsonNode>, v2RawRecords: List<JsonNode>) {
-        val v2RecordMap =
-            v2RawRecords
-                .stream()
-                .collect(
-                    Collectors.toMap(
-                        { record: JsonNode -> record["_airbyte_raw_id"].asText() },
-                        Function.identity()
-                    )
-                )
+        val v2RecordMap = v2RawRecords.associateBy { it["_airbyte_raw_id"].asText() }
         Assertions.assertAll(
             Executable { Assertions.assertEquals(6, v1RawRecords.size) },
             Executable { Assertions.assertEquals(6, v2RawRecords.size) }
@@ -1758,7 +1745,6 @@ abstract class BaseSqlGeneratorIntegrationTest<DestinationState : MinimumDestina
                 Assertions.assertEquals(
                     0,
                     actualRawRecords
-                        .stream()
                         .filter { record: JsonNode -> !record.hasNonNull("_airbyte_loaded_at") }
                         .count()
                 )
@@ -1790,7 +1776,6 @@ abstract class BaseSqlGeneratorIntegrationTest<DestinationState : MinimumDestina
                 Assertions.assertEquals(
                     0,
                     actualRawRecords
-                        .stream()
                         .filter { record: JsonNode -> !record.hasNonNull("_airbyte_loaded_at") }
                         .count()
                 )
@@ -1838,7 +1823,6 @@ abstract class BaseSqlGeneratorIntegrationTest<DestinationState : MinimumDestina
             )
         @JvmField
         val FINAL_TABLE_COLUMN_NAMES_CDC: List<String> =
-            Streams.concat(FINAL_TABLE_COLUMN_NAMES.stream(), Stream.of("_ab_cdc_deleted_at"))
-                .toList()
+            FINAL_TABLE_COLUMN_NAMES + "_ab_cdc_deleted_at"
     }
 }

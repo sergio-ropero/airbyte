@@ -42,25 +42,21 @@ class AirbyteExceptionHandler : Thread.UncaughtExceptionHandler {
         // message.
         // This assumes that any wrapping exceptions are just noise (e.g. runtime exception).
         val deinterpolatableException =
-            ExceptionUtils.getThrowableList(throwable)
-                .stream()
-                .filter { t: Throwable ->
-                    THROWABLES_TO_DEINTERPOLATE.stream().anyMatch {
-                        deinterpolatableClass: Class<out Throwable> ->
-                        deinterpolatableClass.isAssignableFrom(t.javaClass)
-                    }
+            ExceptionUtils.getThrowableList(throwable).firstOrNull { t: Throwable ->
+                THROWABLES_TO_DEINTERPOLATE.any { deinterpolatableClass: Class<out Throwable> ->
+                    deinterpolatableClass.isAssignableFrom(t.javaClass)
                 }
-                .findFirst()
+            }
         val messageWasMangled: Boolean
-        if (deinterpolatableException.isPresent) {
-            val originalMessage = deinterpolatableException.get().message
+        if (deinterpolatableException != null) {
+            val originalMessage = deinterpolatableException.message
             mangledMessage =
                 STRINGS_TO_DEINTERPOLATE
-                    .stream() // Sort the strings longest to shortest, in case any target string is
+                    // Sort the strings longest to shortest, in case any target string is
                     // a substring of another
                     // e.g. "airbyte_internal" should be swapped out before "airbyte"
-                    .sorted(Comparator.comparing { obj: String -> obj.length }.reversed())
-                    .reduce(originalMessage) { message: String?, targetString: String? ->
+                    .sortedWith(Comparator.comparing { obj: String -> obj.length }.reversed())
+                    .fold(originalMessage) { message: String?, targetString: String? ->
                         deinterpolate(message, targetString)
                     }
             messageWasMangled = mangledMessage != originalMessage

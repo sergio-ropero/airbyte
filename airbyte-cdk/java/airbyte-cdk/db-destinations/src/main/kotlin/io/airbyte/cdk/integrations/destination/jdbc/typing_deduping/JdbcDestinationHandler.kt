@@ -27,7 +27,6 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionStage
 import java.util.function.Predicate
 import lombok.extern.slf4j.Slf4j
-import org.jooq.Condition
 import org.jooq.DSLContext
 import org.jooq.SQLDialect
 import org.jooq.conf.ParamType
@@ -197,7 +196,6 @@ abstract class JdbcDestinationHandler<DestinationState>(
 
         val initialStates =
             streamConfigs
-                .stream()
                 .map { streamConfig: StreamConfig ->
                     retrieveState(destinationStatesFuture, streamConfig)
                 }
@@ -378,26 +376,25 @@ abstract class JdbcDestinationHandler<DestinationState>(
             )
 
         // Filter out Meta columns since they don't exist in stream config.
-        val actualColumns =
-            existingTable.columns.entries
-                .stream()
-                .filter { column: Map.Entry<String?, ColumnDefinition> ->
-                    JavaBaseConstants.V2_FINAL_TABLE_METADATA_COLUMNS.stream().noneMatch {
-                        airbyteColumnName: String ->
-                        airbyteColumnName == column.key
-                    }
+        val actualColumns: LinkedHashMap<String?, String> = LinkedHashMap()
+        existingTable.columns.entries
+            .stream()
+            .filter { column: Map.Entry<String?, ColumnDefinition> ->
+                JavaBaseConstants.V2_FINAL_TABLE_METADATA_COLUMNS.none { airbyteColumnName: String
+                    ->
+                    airbyteColumnName == column.key
                 }
-                .collect(
-                    { LinkedHashMap() },
-                    {
-                        map: LinkedHashMap<String?, String>,
-                        column: Map.Entry<String?, ColumnDefinition> ->
-                        map[column.key] = column.value.type
-                    },
-                    { obj: LinkedHashMap<String?, String>, m: LinkedHashMap<String?, String> ->
-                        obj.putAll(m)
-                    }
-                )
+            }
+            .collect(
+                { LinkedHashMap() },
+                { map: LinkedHashMap<String?, String>, column: Map.Entry<String?, ColumnDefinition>
+                    ->
+                    map[column.key] = column.value.type
+                },
+                { obj: LinkedHashMap<String?, String>, m: LinkedHashMap<String?, String> ->
+                    obj.putAll(m)
+                }
+            )
 
         return actualColumns == intendedColumns
     }
@@ -415,7 +412,6 @@ abstract class JdbcDestinationHandler<DestinationState>(
                     .deleteFrom(table(quotedName(rawTableSchemaName, DESTINATION_STATE_TABLE_NAME)))
                     .where(
                         destinationStates.keys
-                            .stream()
                             .map { streamId: StreamId ->
                                 field(quotedName(DESTINATION_STATE_TABLE_COLUMN_NAME))
                                     .eq(streamId.originalName)
@@ -424,9 +420,7 @@ abstract class JdbcDestinationHandler<DestinationState>(
                                             .eq(streamId.originalNamespace)
                                     )
                             }
-                            .reduce(DSL.falseCondition()) { obj: Condition, arg2: Condition ->
-                                obj.or(arg2)
-                            }
+                            .reduce { obj, arg2 -> obj.or(arg2) }
                     )
                     .getSQL(ParamType.INLINED)
 

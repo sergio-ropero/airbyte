@@ -25,7 +25,6 @@ import java.util.*
 import java.util.concurrent.Executors
 import java.util.function.Consumer
 import java.util.function.Function
-import java.util.stream.Collectors
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -228,14 +227,9 @@ private constructor(
                 val message =
                     String.format(
                         "You are trying to write multiple streams to the same table. Consider switching to a custom namespace format using \${SOURCE_NAMESPACE}, or moving one of them into a separate connection with a different stream prefix. Affected streams: %s",
-                        conflictingStreams
-                            .stream()
-                            .map<String>(
-                                Function<WriteConfig, String> { config: WriteConfig ->
-                                    config.namespace + "." + config.streamName
-                                }
-                            )
-                            .collect(Collectors.joining(", "))
+                        conflictingStreams.joinToString(", ") { config: WriteConfig ->
+                            config.namespace + "." + config.streamName
+                        }
                     )
                 throw ConfigErrorException(message)
             }
@@ -265,11 +259,10 @@ private constructor(
             parsedCatalog: ParsedCatalog?,
             useDestinationsV2Columns: Boolean
         ): List<WriteConfig> {
-            return catalog!!
-                .streams
-                .stream()
-                .map(toWriteConfig(namingResolver, config, parsedCatalog, useDestinationsV2Columns))
-                .toList()
+            return catalog!!.streams.map {
+                toWriteConfig(namingResolver, config, parsedCatalog, useDestinationsV2Columns)
+                    .apply(it)
+            }
         }
 
         private fun toWriteConfig(

@@ -15,7 +15,6 @@ import io.airbyte.protocol.models.v0.DestinationSyncMode
 import java.sql.Timestamp
 import java.time.Instant
 import java.util.*
-import java.util.stream.Stream
 import kotlin.Any
 import kotlin.Boolean
 import kotlin.IllegalArgumentException
@@ -159,19 +158,16 @@ constructor(
     ): List<Field<*>> {
         val fields =
             metaColumns.entries
-                .stream()
                 .map { metaColumn: Map.Entry<String?, DataType<*>?> ->
                     DSL.field(DSL.quotedName(metaColumn.key), metaColumn.value)
                 }
                 .toList()
         val dataFields =
             columns.entries
-                .stream()
                 .map { column: Map.Entry<ColumnId?, AirbyteType> ->
                     DSL.field(DSL.quotedName(column.key!!.name), toDialectType(column.value))
                 }
-                .toList()
-        dataFields.addAll(fields)
+                .toList() + fields
         return dataFields
     }
 
@@ -208,7 +204,6 @@ constructor(
     ): List<Field<*>> {
         val fields =
             metaColumns.entries
-                .stream()
                 .map { metaColumn: Map.Entry<String?, DataType<*>?> ->
                     DSL.field(DSL.quotedName(metaColumn.key), metaColumn.value)
                 }
@@ -251,17 +246,8 @@ constructor(
         val finalTableIdentifier = stream.id.finalName + suffix.lowercase(Locale.getDefault())
         if (!force) {
             return transactionally(
-                Stream.concat(
-                        Stream.of(
-                            createTableSql(
-                                stream.id.finalNamespace,
-                                finalTableIdentifier,
-                                stream.columns!!
-                            )
-                        ),
-                        createIndexSql(stream, suffix).stream()
-                    )
-                    .toList()
+                createTableSql(stream.id.finalNamespace, finalTableIdentifier, stream.columns!!) +
+                    createIndexSql(stream, suffix)
             )
         }
 
@@ -272,18 +258,10 @@ constructor(
         }
 
         return transactionally(
-            Stream.concat(
-                    Stream.of(
-                        dropTableStep.getSQL(ParamType.INLINED),
-                        createTableSql(
-                            stream.id.finalNamespace,
-                            finalTableIdentifier,
-                            stream.columns!!
-                        )
-                    ),
-                    createIndexSql(stream, suffix).stream()
-                )
-                .toList()
+            listOf(
+                dropTableStep.getSQL(ParamType.INLINED),
+                createTableSql(stream.id.finalNamespace, finalTableIdentifier, stream.columns!!)
+            ) + createIndexSql(stream, suffix)
         )
     }
 

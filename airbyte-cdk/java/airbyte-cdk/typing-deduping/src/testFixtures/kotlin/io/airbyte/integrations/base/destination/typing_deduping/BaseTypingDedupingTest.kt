@@ -27,7 +27,6 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import java.util.function.Consumer
 import java.util.function.Function
-import java.util.stream.Stream
 import org.apache.commons.lang3.RandomStringUtils
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.function.Executable
@@ -570,11 +569,10 @@ abstract class BaseTypingDedupingTest {
         val expectedRawRecords2 = readRecords("dat/sync2_expectedrecords_raw.jsonl")
         val expectedFinalRecords2 =
             readRecords("dat/sync2_expectedrecords_fullrefresh_append_final.jsonl")
-                .stream()
-                .peek { record: JsonNode ->
-                    (record as ObjectNode).remove(sqlGenerator.buildColumnId("name").name)
-                }
-                .toList()
+        expectedFinalRecords2.forEach { record: JsonNode ->
+            (record as ObjectNode).remove(sqlGenerator.buildColumnId("name").name)
+        }
+
         verifySyncResult(expectedRawRecords2, expectedFinalRecords2, disableFinalTableComparison())
     }
 
@@ -649,11 +647,8 @@ abstract class BaseTypingDedupingTest {
 
         // First sync
         val messages1 =
-            Stream.concat(
-                    readMessages("dat/sync1_messages.jsonl", namespace1, streamName).stream(),
-                    readMessages("dat/sync1_messages2.jsonl", namespace2, streamName).stream()
-                )
-                .toList()
+            readMessages("dat/sync1_messages.jsonl", namespace1, streamName) +
+                readMessages("dat/sync1_messages2.jsonl", namespace2, streamName)
 
         runSync(catalog, messages1)
 
@@ -674,12 +669,8 @@ abstract class BaseTypingDedupingTest {
 
         // Second sync
         val messages2 =
-            Stream.concat(
-                    readMessages("dat/sync2_messages.jsonl", namespace1, streamName).stream(),
-                    readMessages("dat/sync2_messages2.jsonl", namespace2, streamName).stream()
-                )
-                .toList()
-
+            readMessages("dat/sync2_messages.jsonl", namespace1, streamName) +
+                readMessages("dat/sync2_messages2.jsonl", namespace2, streamName)
         runSync(catalog, messages2)
 
         verifySyncResult(
@@ -897,10 +888,7 @@ abstract class BaseTypingDedupingTest {
     }
 
     private fun <T> repeatList(n: Int, list: List<T>): List<T> {
-        return Collections.nCopies(n, list)
-            .stream()
-            .flatMap { obj: List<T> -> obj.stream() }
-            .toList()
+        return Collections.nCopies(n, list).flatMap { obj: List<T> -> obj }.toList()
     }
 
     @Throws(Exception::class)
@@ -1102,13 +1090,11 @@ abstract class BaseTypingDedupingTest {
             streamName: String?
         ): List<AirbyteMessage> {
             return readRecords(filename)
-                .stream()
                 .map { record: JsonNode -> Jsons.convertValue(record, AirbyteMessage::class.java) }
-                .peek { message: AirbyteMessage ->
+                .onEach { message: AirbyteMessage ->
                     message.record.namespace = streamNamespace
                     message.record.stream = streamName
                 }
-                .toList()
         }
 
         protected fun pushMessages(

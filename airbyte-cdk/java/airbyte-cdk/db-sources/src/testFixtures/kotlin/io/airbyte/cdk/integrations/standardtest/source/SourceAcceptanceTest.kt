@@ -212,7 +212,6 @@ abstract class SourceAcceptanceTest : AbstractSourceConnectorTest() {
         // only sync incremental streams
         configuredCatalog.streams =
             configuredCatalog.streams
-                .stream()
                 .filter { s: ConfiguredAirbyteStream -> s.syncMode == SyncMode.INCREMENTAL }
                 .toList()
 
@@ -220,7 +219,6 @@ abstract class SourceAcceptanceTest : AbstractSourceConnectorTest() {
         val recordMessages = filterRecords(airbyteMessages)
         val stateMessages =
             airbyteMessages
-                .stream()
                 .filter { m: AirbyteMessage -> m.type == AirbyteMessage.Type.STATE }
                 .map { obj: AirbyteMessage -> obj.state }
                 .toList()
@@ -375,10 +373,9 @@ abstract class SourceAcceptanceTest : AbstractSourceConnectorTest() {
         message: String
     ) {
         val prunedExpected =
-            expected.stream().map { m: AirbyteRecordMessage -> this.pruneEmittedAt(m) }.toList()
+            expected.map { m: AirbyteRecordMessage -> this.pruneEmittedAt(m) }.toList()
         val prunedActual =
             actual
-                .stream()
                 .map { m: AirbyteRecordMessage -> this.pruneEmittedAt(m) }
                 .map { m: AirbyteRecordMessage -> this.pruneCdcMetadata(m) }
                 .toList()
@@ -419,7 +416,6 @@ abstract class SourceAcceptanceTest : AbstractSourceConnectorTest() {
             messages: Collection<AirbyteMessage>
         ): List<AirbyteRecordMessage> {
             return messages
-                .stream()
                 .filter { m: AirbyteMessage -> m.type == AirbyteMessage.Type.RECORD }
                 .map { obj: AirbyteMessage -> obj.record }
                 .toList()

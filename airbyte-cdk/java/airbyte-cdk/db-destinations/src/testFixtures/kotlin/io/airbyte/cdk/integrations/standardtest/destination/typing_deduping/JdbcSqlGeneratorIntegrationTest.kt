@@ -65,7 +65,6 @@ abstract class JdbcSqlGeneratorIntegrationTest<DestinationState : MinimumDestina
             dslContext.insertInto(
                 DSL.table(tableName),
                 columnNames
-                    .stream()
                     .map { columnName: String -> DSL.field(DSL.quotedName(columnName)) }
                     .toList()
             )
@@ -73,7 +72,6 @@ abstract class JdbcSqlGeneratorIntegrationTest<DestinationState : MinimumDestina
             insert =
                 insert.values(
                     columnNames
-                        .stream()
                         .map { fieldName: String ->
                             // Convert this field to a string. Pretty naive implementation.
                             val column = record[fieldName]
