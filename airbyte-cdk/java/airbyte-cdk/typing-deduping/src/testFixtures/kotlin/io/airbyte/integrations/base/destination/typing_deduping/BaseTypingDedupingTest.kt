@@ -888,7 +888,7 @@ abstract class BaseTypingDedupingTest {
     }
 
     private fun <T> repeatList(n: Int, list: List<T>): List<T> {
-        return Collections.nCopies(n, list).flatMap { obj: List<T> -> obj }.toList()
+        return Collections.nCopies(n, list).flatMap { obj: List<T> -> obj }
     }
 
     @Throws(Exception::class)
@@ -1080,7 +1080,6 @@ abstract class BaseTypingDedupingTest {
                 .filter { line: String -> !line.isEmpty() }
                 .filter { line: String -> !line.startsWith("//") }
                 .map { jsonString: String -> Jsons.deserializeExact(jsonString) }
-                .toList()
         }
 
         @Throws(IOException::class)

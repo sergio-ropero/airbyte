@@ -118,6 +118,7 @@ internal class CatalogParserTest {
         val catalog = ConfiguredAirbyteCatalog().withStreams(List.of(stream("a", "a", schema)))
 
         val parsedCatalog = parser.parseCatalog(catalog)
+        // Fishy fishy!
         val columnsList = parsedCatalog.streams[0].columns!!.keys.toList()
 
         assertAll(
@@ -156,6 +157,7 @@ internal class CatalogParserTest {
         val catalog = ConfiguredAirbyteCatalog().withStreams(listOf(stream("a", "a", schema)))
 
         val parsedCatalog = parser.parseCatalog(catalog)
+        // Fishy fishy!
         val columnsList = parsedCatalog.streams[0].columns!!.keys.toList()
 
         assertAll(

@@ -211,9 +211,9 @@ abstract class SourceAcceptanceTest : AbstractSourceConnectorTest() {
         val configuredCatalog = withSourceDefinedCursors(configuredCatalog)
         // only sync incremental streams
         configuredCatalog.streams =
-            configuredCatalog.streams
-                .filter { s: ConfiguredAirbyteStream -> s.syncMode == SyncMode.INCREMENTAL }
-                .toList()
+            configuredCatalog.streams.filter { s: ConfiguredAirbyteStream ->
+                s.syncMode == SyncMode.INCREMENTAL
+            }
 
         val airbyteMessages = runRead(configuredCatalog, state)
         val recordMessages = filterRecords(airbyteMessages)
@@ -221,7 +221,7 @@ abstract class SourceAcceptanceTest : AbstractSourceConnectorTest() {
             airbyteMessages
                 .filter { m: AirbyteMessage -> m.type == AirbyteMessage.Type.STATE }
                 .map { obj: AirbyteMessage -> obj.state }
-                .toList()
+
         Assertions.assertFalse(
             recordMessages.isEmpty(),
             "Expected the first incremental sync to produce records"
@@ -372,13 +372,12 @@ abstract class SourceAcceptanceTest : AbstractSourceConnectorTest() {
         actual: List<AirbyteRecordMessage>,
         message: String
     ) {
-        val prunedExpected =
-            expected.map { m: AirbyteRecordMessage -> this.pruneEmittedAt(m) }.toList()
+        val prunedExpected = expected.map { m: AirbyteRecordMessage -> this.pruneEmittedAt(m) }
         val prunedActual =
             actual
                 .map { m: AirbyteRecordMessage -> this.pruneEmittedAt(m) }
                 .map { m: AirbyteRecordMessage -> this.pruneCdcMetadata(m) }
-                .toList()
+
         Assertions.assertEquals(prunedExpected.size, prunedActual.size, message)
         Assertions.assertTrue(prunedExpected.containsAll(prunedActual), message)
         Assertions.assertTrue(prunedActual.containsAll(prunedExpected), message)
@@ -418,7 +417,6 @@ abstract class SourceAcceptanceTest : AbstractSourceConnectorTest() {
             return messages
                 .filter { m: AirbyteMessage -> m.type == AirbyteMessage.Type.RECORD }
                 .map { obj: AirbyteMessage -> obj.record }
-                .toList()
         }
 
         @JvmStatic

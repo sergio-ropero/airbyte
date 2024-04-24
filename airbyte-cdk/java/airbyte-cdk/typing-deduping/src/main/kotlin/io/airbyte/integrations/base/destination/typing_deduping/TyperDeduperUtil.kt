@@ -134,7 +134,7 @@ class TyperDeduperUtil {
                 }
             getResultsOrLogAndThrowFirst(
                 "The following exceptions were thrown attempting to run migrations:\n",
-                CompletableFutures.allOf(futures.toList()).toCompletableFuture().join()
+                CompletableFutures.allOf(futures).toCompletableFuture().join()
             )
         }
 

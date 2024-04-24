@@ -289,7 +289,6 @@ abstract class CdcSourceTest<S : Source, T : TestDatabase<*, T, *>> {
         return messages
             .filter { r: AirbyteMessage -> r.type == AirbyteMessage.Type.STATE }
             .map { obj: AirbyteMessage -> obj.state }
-            .toList()
     }
 
     protected fun assertExpectedRecords(
@@ -1052,18 +1051,17 @@ abstract class CdcSourceTest<S : Source, T : TestDatabase<*, T, *>> {
         @JvmField
         val MODEL_RECORDS_RANDOM: List<JsonNode> =
             MODEL_RECORDS.map { r: JsonNode ->
-                    Jsons.jsonNode(
-                        ImmutableMap.of(
-                            COL_ID + "_random",
-                            r[COL_ID].asInt() * 1000,
-                            COL_MAKE_ID + "_random",
-                            r[COL_MAKE_ID],
-                            COL_MODEL + "_random",
-                            r[COL_MODEL].asText() + "-random"
-                        )
+                Jsons.jsonNode(
+                    ImmutableMap.of(
+                        COL_ID + "_random",
+                        r[COL_ID].asInt() * 1000,
+                        COL_MAKE_ID + "_random",
+                        r[COL_MAKE_ID],
+                        COL_MODEL + "_random",
+                        r[COL_MODEL].asText() + "-random"
                     )
-                }
-                .toList()
+                )
+            }
 
         @JvmStatic
         protected fun removeDuplicates(

@@ -7,13 +7,11 @@ import com.google.common.collect.Lists
 import io.airbyte.commons.logging.LoggingHelper
 import io.airbyte.commons.logging.MdcScope
 import java.lang.reflect.InvocationTargetException
-import java.util.List
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Consumer
 import java.util.function.Supplier
-import java.util.stream.Stream
 import kotlin.concurrent.Volatile
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.Logger
@@ -66,7 +64,7 @@ abstract class ContainerFactory<C : GenericContainer<*>> {
 
     private fun getTestContainerLogMdcBuilder(
         imageName: DockerImageName?,
-        containerModifiers: MutableList<out NamedContainerModifier<C>>
+        containerModifiers: List<out NamedContainerModifier<C>>
     ): MdcScope.Builder {
         return MdcScope.Builder()
             .setLogPrefix(
@@ -93,26 +91,24 @@ abstract class ContainerFactory<C : GenericContainer<*>> {
     fun shared(imageName: String, vararg methods: String): C {
         return shared(
             imageName,
-            Stream.of(*methods)
-                .map { n: String -> NamedContainerModifierImpl<C>(n, resolveModifierByName(n)) }
-                .toList()
+            methods.map { n: String -> NamedContainerModifierImpl<C>(n, resolveModifierByName(n)) }
         )
     }
 
     fun shared(imageName: String, vararg namedContainerModifiers: NamedContainerModifier<C>): C {
-        return shared(imageName, List.of(*namedContainerModifiers))
+        return shared(imageName, namedContainerModifiers.asList())
     }
 
     @JvmOverloads
     fun shared(
         imageName: String,
-        namedContainerModifiers: MutableList<out NamedContainerModifier<C>> = ArrayList()
+        namedContainerModifiers: List<out NamedContainerModifier<C>> = ArrayList()
     ): C {
         val containerKey =
             ContainerKey<C>(
                 javaClass,
                 DockerImageName.parse(imageName),
-                namedContainerModifiers.map { it.name() }.toList()
+                namedContainerModifiers.map { it.name() }
             )
         // We deliberately avoid creating the container itself eagerly during the evaluation of the
         // map
@@ -137,20 +133,18 @@ abstract class ContainerFactory<C : GenericContainer<*>> {
     fun exclusive(imageName: String, vararg methods: String): C {
         return exclusive(
             imageName,
-            Stream.of(*methods)
-                .map { n: String -> NamedContainerModifierImpl<C>(n, resolveModifierByName(n)) }
-                .toList()
+            methods.map { n: String -> NamedContainerModifierImpl<C>(n, resolveModifierByName(n)) }
         )
     }
 
     fun exclusive(imageName: String, vararg namedContainerModifiers: NamedContainerModifier<C>): C {
-        return exclusive(imageName, List.of(*namedContainerModifiers))
+        return exclusive(imageName, namedContainerModifiers.asList())
     }
 
     @JvmOverloads
     fun exclusive(
         imageName: String,
-        namedContainerModifiers: MutableList<out NamedContainerModifier<C>> = ArrayList()
+        namedContainerModifiers: List<out NamedContainerModifier<C>> = ArrayList()
     ): C {
         return createAndStartContainer(DockerImageName.parse(imageName), namedContainerModifiers)
     }
@@ -200,7 +194,7 @@ abstract class ContainerFactory<C : GenericContainer<*>> {
 
     private fun createAndStartContainer(
         imageName: DockerImageName?,
-        namedContainerModifiers: MutableList<out NamedContainerModifier<C>>
+        namedContainerModifiers: List<out NamedContainerModifier<C>>
     ): C {
         LOGGER!!.info(
             "Creating new container based on {} with {}.",
