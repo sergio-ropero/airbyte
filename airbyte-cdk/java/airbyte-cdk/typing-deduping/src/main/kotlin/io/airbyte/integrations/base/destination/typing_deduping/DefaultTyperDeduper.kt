@@ -55,9 +55,9 @@ class DefaultTyperDeduper<DestinationState : MinimumDestinationState>(
     private val v2TableMigrator: V2TableMigrator
     private val migrations: List<Migration<DestinationState>>
     private val parsedCatalog: ParsedCatalog
-    private var overwriteStreamsWithTmpTable: MutableSet<StreamId?>? = null
+    private var overwriteStreamsWithTmpTable: MutableSet<StreamId>? = null
     private val streamsWithSuccessfulSetup: MutableSet<Pair<String, String>>
-    private val initialRawTableStateByStream: MutableMap<StreamId?, InitialRawTableStatus>
+    private val initialRawTableStateByStream: MutableMap<StreamId, InitialRawTableStatus>
 
     // We only want to run a single instance of T+D per stream at a time. These objects are used for
     // synchronization per stream.
@@ -65,11 +65,11 @@ class DefaultTyperDeduper<DestinationState : MinimumDestinationState>(
     // * any number of threads can insert to the raw tables at the same time, as long as T+D isn't
     // running (i.e. "read lock")
     // * T+D must run in complete isolation (i.e. "write lock")
-    private val tdLocks: MutableMap<StreamId?, ReadWriteLock>
+    private val tdLocks: MutableMap<StreamId, ReadWriteLock>
 
     // These locks are used to prevent multiple simultaneous attempts to T+D the same stream.
     // We use tryLock with these so that we don't queue up multiple T+D runs for the same stream.
-    private val internalTdLocks: MutableMap<StreamId?, Lock>
+    private val internalTdLocks: MutableMap<StreamId, Lock>
 
     private val executorService: ExecutorService
     private lateinit var destinationInitialStatuses:
@@ -485,7 +485,7 @@ class DefaultTyperDeduper<DestinationState : MinimumDestinationState>(
                         return@supplyAsync Optional.of(e)
                     }
                 }
-                return@supplyAsync Optional.empty<Exception?>()
+                return@supplyAsync Optional.empty<Exception>()
             },
             this.executorService
         )

@@ -48,7 +48,7 @@ constructor(
 
     private var destinationProcess: Process? = null
     private var writer: AirbyteMessageBufferedWriter? = null
-    private var messageIterator: Iterator<AirbyteMessage?>? = null
+    private var messageIterator: Iterator<AirbyteMessage>? = null
 
     private var exitValueIsSet = false
     private var exitValue: Int = 0

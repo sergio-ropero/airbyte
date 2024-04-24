@@ -173,7 +173,7 @@ protected constructor(val container: C) : AutoCloseable {
             database!!.query<Any?> { ctx: DSLContext ->
                 sql.forEach { statement: String ->
                     LOGGER!!.info("executing SQL statement {}", statement)
-                    ctx!!.execute(statement)
+                    ctx.execute(statement)
                 }
                 null
             }
@@ -193,7 +193,7 @@ protected constructor(val container: C) : AutoCloseable {
                     String.format("executing command %s", Strings.join(cmd.asIterable(), " "))
                 )
             )
-            val exec = container.execInContainer(*cmd.toTypedArray<String?>())
+            val exec = container.execInContainer(*cmd.toTypedArray<String>())
             if (exec!!.exitCode == 0) {
                 LOGGER.info(
                     formatLogLine(

@@ -18,11 +18,11 @@ import org.slf4j.LoggerFactory
 class TypeAndDedupeOperationValve
 @JvmOverloads
 constructor(private val nowness: Supplier<Long> = SYSTEM_NOW) :
-    ConcurrentHashMap<AirbyteStreamNameNamespacePair, Long?>() {
+    ConcurrentHashMap<AirbyteStreamNameNamespacePair, Long>() {
     private val incrementalIndex = ConcurrentHashMap<AirbyteStreamNameNamespacePair, Int>()
 
     @SuppressFBWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
-    override fun put(key: AirbyteStreamNameNamespacePair, value: Long?): Long? {
+    override fun put(key: AirbyteStreamNameNamespacePair, value: Long): Long? {
         if (!incrementalIndex.containsKey(key)) {
             incrementalIndex[key] = 0
         }

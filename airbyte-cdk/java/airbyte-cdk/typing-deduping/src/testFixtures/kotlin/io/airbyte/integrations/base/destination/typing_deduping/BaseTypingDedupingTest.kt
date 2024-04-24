@@ -953,8 +953,8 @@ abstract class BaseTypingDedupingTest {
     ): CompletableFuture<List<io.airbyte.protocol.models.AirbyteMessage>> {
         val outputFuture = CompletableFuture<List<io.airbyte.protocol.models.AirbyteMessage>>()
         Executors.newSingleThreadExecutor()
-            .submit<Void?>(
-                Callable<Void?> {
+            .submit<Void>(
+                Callable<Void> {
                     val destinationMessages:
                         MutableList<io.airbyte.protocol.models.AirbyteMessage> =
                         ArrayList()

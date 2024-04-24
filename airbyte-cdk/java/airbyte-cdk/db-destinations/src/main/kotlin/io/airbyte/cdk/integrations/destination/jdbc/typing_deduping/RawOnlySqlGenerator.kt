@@ -57,7 +57,7 @@ class RawOnlySqlGenerator(namingTransformer: NamingConventionTransformer) :
     }
 
     override fun getRowNumber(
-        primaryKey: List<ColumnId?>?,
+        primaryKey: List<ColumnId>?,
         cursorField: Optional<ColumnId>,
     ): Field<Int> {
         throw NotImplementedError("This Destination does not support final tables")

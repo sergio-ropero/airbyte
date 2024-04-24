@@ -375,25 +375,26 @@ abstract class JdbcDestinationHandler<DestinationState>(
             )
 
         // Filter out Meta columns since they don't exist in stream config.
-        val actualColumns: LinkedHashMap<String?, String> = LinkedHashMap()
-        existingTable.columns.entries
-            .stream()
-            .filter { column: Map.Entry<String?, ColumnDefinition> ->
-                JavaBaseConstants.V2_FINAL_TABLE_METADATA_COLUMNS.none { airbyteColumnName: String
-                    ->
-                    airbyteColumnName == column.key
+        val actualColumns: LinkedHashMap<String, String> =
+            existingTable.columns.entries
+                .stream()
+                .filter { column: Map.Entry<String, ColumnDefinition> ->
+                    JavaBaseConstants.V2_FINAL_TABLE_METADATA_COLUMNS.none {
+                        airbyteColumnName: String ->
+                        airbyteColumnName == column.key
+                    }
                 }
-            }
-            .collect(
-                { LinkedHashMap() },
-                { map: LinkedHashMap<String?, String>, column: Map.Entry<String?, ColumnDefinition>
-                    ->
-                    map[column.key] = column.value.type
-                },
-                { obj: LinkedHashMap<String?, String>, m: LinkedHashMap<String?, String> ->
-                    obj.putAll(m)
-                }
-            )
+                .collect(
+                    { LinkedHashMap() },
+                    {
+                        map: LinkedHashMap<String, String>,
+                        column: Map.Entry<String, ColumnDefinition> ->
+                        map[column.key] = column.value.type
+                    },
+                    { obj: LinkedHashMap<String, String>, m: LinkedHashMap<String, String> ->
+                        obj.putAll(m)
+                    }
+                )
 
         return actualColumns == intendedColumns
     }
@@ -493,7 +494,7 @@ abstract class JdbcDestinationHandler<DestinationState>(
                     // TODO: normalize namespace and finalName strings to quoted-lowercase (as
                     // needed. Snowflake
                     // requires uppercase)
-                    val columnDefinitions = LinkedHashMap<String?, ColumnDefinition>()
+                    val columnDefinitions = LinkedHashMap<String, ColumnDefinition>()
                     LOGGER.info(
                         "Retrieving existing columns for {}.{}.{}",
                         databaseName,

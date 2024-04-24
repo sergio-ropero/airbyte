@@ -321,7 +321,7 @@ abstract class CdcSourceTest<S : Source, T : TestDatabase<*, T, *>> {
         expectedRecords: Set<JsonNode>?,
         actualRecords: Set<AirbyteRecordMessage>,
         cdcStreams: Set<String>,
-        streamNames: Set<String?>,
+        streamNames: Set<String>,
         namespace: String?
     ) {
         val actualData =
@@ -1030,7 +1030,7 @@ abstract class CdcSourceTest<S : Source, T : TestDatabase<*, T, *>> {
         private val LOGGER: Logger = LoggerFactory.getLogger(CdcSourceTest::class.java)
 
         const val MODELS_STREAM_NAME: String = "models"
-        @JvmField val STREAM_NAMES: Set<String?> = java.util.Set.of(MODELS_STREAM_NAME)
+        @JvmField val STREAM_NAMES: Set<String> = java.util.Set.of(MODELS_STREAM_NAME)
         protected const val COL_ID: String = "id"
         protected const val COL_MAKE_ID: String = "make_id"
         protected const val COL_MODEL: String = "model"

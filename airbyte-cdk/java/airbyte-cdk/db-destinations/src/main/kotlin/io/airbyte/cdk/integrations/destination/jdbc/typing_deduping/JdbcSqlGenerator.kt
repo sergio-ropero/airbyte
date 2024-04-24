@@ -137,7 +137,7 @@ constructor(
      * @return
      */
     protected abstract fun getRowNumber(
-        primaryKey: List<ColumnId?>?,
+        primaryKey: List<ColumnId>?,
         cursorField: Optional<ColumnId>
     ): Field<Int>
 
@@ -163,8 +163,8 @@ constructor(
 
         val dataFields =
             columns.entries
-                .map { column: Map.Entry<ColumnId?, AirbyteType> ->
-                    DSL.field(DSL.quotedName(column.key!!.name), toDialectType(column.value))
+                .map { column: Map.Entry<ColumnId, AirbyteType> ->
+                    DSL.field(DSL.quotedName(column.key.name), toDialectType(column.value))
                 }
                 .toList() + fields
         return dataFields
@@ -514,7 +514,7 @@ constructor(
     private fun deleteFromFinalTable(
         schemaName: String?,
         tableName: String,
-        primaryKeys: List<ColumnId?>,
+        primaryKeys: List<ColumnId>,
         cursor: Optional<ColumnId>
     ): String {
         val dsl = dslContext
