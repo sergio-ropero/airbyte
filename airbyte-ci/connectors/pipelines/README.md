@@ -649,6 +649,7 @@ E.G.: running Poe tasks on the modified internal packages of the current branch:
 
 | Version | PR                                                         | Description                                                                                                                  |
 | ------- | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| 4.9.2   | [#37615](https://github.com/airbytehq/airbyte/pull/37615)      | Fix `KeyError` when running `migrate-to-poetry` |
 | 4.9.1   | [#37614](https://github.com/airbytehq/airbyte/pull/37614)      | Fix `UnboundLocalError: local variable 'add_changelog_entry_result' referenced before assignment` in `migrate_to_base_image` |
 | 4.9.0   | [#37440](https://github.com/airbytehq/airbyte/pull/37440)  | Run regression tests with `airbyte-ci connectors test`                                                                       |
 | 4.8.0   | [#37404](https://github.com/airbytehq/airbyte/pull/37404)  | Accept a `git-repo-url` option on the `airbyte-ci` root command to checkout forked repo.                                     |
